@@ -1,0 +1,1 @@
+export type Unit<T> = Record<string, T>
