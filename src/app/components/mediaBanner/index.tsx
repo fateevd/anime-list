@@ -1,12 +1,11 @@
 "use client";
 import {Media} from "@/generated/graphql";
-import React, {FC, PropsWithChildren, Suspense, useEffect, useMemo, useRef, useState} from "react";
+import React, {FC, PropsWithChildren, useEffect, useMemo, useState} from "react";
 import {gql, useQuery} from "@apollo/client";
-import {useSuspenseQuery} from "@apollo/experimental-nextjs-app-support/ssr";
 import {Unit} from "@/types";
 import {AiOutlineClose} from "react-icons/ai";
 import {useRouter} from "next/navigation";
-import YouTube from "react-youtube";
+import Loading from "@/app/loading";
 
 export const dynamic = "force-dynamic";
 
@@ -40,9 +39,13 @@ export const A = ({params, section}: Props) => {
   }
 
 
-  if (loading) return <div className="w-full text-primary anime  expanded h-[717px] ">Loading...</div>
-
-
+  if (loading) {
+    return (
+      <div className="w-full text-primary anime  expanded h-[717px] ">
+        <Loading/>
+      </div>
+    )
+  }
 
   return <MediaBanner data={data}/>
 }
@@ -182,8 +185,6 @@ export default function MediaBanner({data, isStartBanner}: any) {
     const array = [Number(Media.averageScore) / 10, Media.seasonYear, Number(Media.favourites) / 100, Media.type, Media.type, Media.popularity];
 
 
-
-
   }, [])
 
   return (
@@ -193,7 +194,7 @@ export default function MediaBanner({data, isStartBanner}: any) {
           <div className="relative z-10  w-full h-full pl-16 pr-16 pt-3 pb-3"
                style={{background: 'linear-gradient(90deg, rgb(0, 0, 0) 29%, rgb(255, 255, 255, 0))'}}>
             <div className="flex w-100 pt-4 justify-center">
-              <Tabs tabs={tabs} callback={handleTabClick} active={activeTab} />
+              <Tabs tabs={tabs} callback={handleTabClick} active={activeTab}/>
             </div>
             {closeBanner}
             <TabsContent>
@@ -205,7 +206,7 @@ export default function MediaBanner({data, isStartBanner}: any) {
                 <div>
                   {info}
                 </div>
-                <div className="h-[4.5rem] overflow-hidden" dangerouslySetInnerHTML={{__html: Media.description}} />
+                <div className="h-[4.5rem] overflow-hidden" dangerouslySetInnerHTML={{__html: Media.description}}/>
               </div>
             </TabsContent>
 
