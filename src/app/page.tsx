@@ -1,4 +1,4 @@
-import {ApolloQueryResult, gql} from "@apollo/client";
+import {gql} from "@apollo/client";
 import {Media} from "@/generated/graphql";
 import {Unit} from "@/types";
 import {useQuery} from "@/graphql/useQuery";
@@ -6,6 +6,8 @@ import React from "react";
 import MediaBanner, {A} from "@/app/components/mediaBanner";
 import SideScroll from "@/app/components/slider";
 import {MediaCard} from "@/app/components/mediaCard";
+import Other from "@/app/components/other";
+import {TypeSearchParams} from "@/app/types";
 
 
 const fragmentMedia: string = `fragment media on Media {
@@ -58,7 +60,6 @@ type  T = {
   }
 }
 
-type t = Media[]
 
 type MediaRender = {
   trending: Unit<Media[]>;
@@ -82,21 +83,9 @@ const renderSlider = (array: Media[], section: string) => {
   })
 }
 
-// const items = trending.media?.map((item, index) => {
-//   return (
-//     <div key={index}
-//          className=" flex cursor-pointer items-center relative">
-//       <h2 className="relative top-list text-primary z-0">{index + 1}</h2>
-//       <div className="z-10 ml-6">
-//         <MediaCard item={item} section={'trending'}/>
-//       </div>
-//     </div>
-//   )
-// });
 
-
-export default async function Home({searchParams}: T) {
-  const {data, loading} = await useQuery({
+export default async function Home({searchParams}: Unit<TypeSearchParams>) {
+  const {data} = await useQuery({
       query: gql`${mediaList}`,
       variables: {
         "season": "FALL",
@@ -104,25 +93,13 @@ export default async function Home({searchParams}: T) {
         "type": "ANIME"
       }
     }
-  ) as ApolloQueryResult<MediaRender>
+  );
 
-
-  const {season, trending, other, top} = data
-
-  const renderMedia = (data: Media[] | undefined): t[] => {
-    const a: t[] = [];
-    if (!data) {
-      return a;
-    }
-    for (let i = 0; i < data.length; i += 5) {
-      a.push(data.slice(i, i + 5));
-    }
-    return a;
-  }
-
+  const {trending, other, top} =
+    data as Unit<Unit<Media[]>>
 
   return (
-    <main className="w-full mr-auto ml-auto ">
+    <main className="w-full h-[100vh] mr-auto ml-auto ">
       <Test/>
 
       <div className="w-[95%] mr-auto ml-auto">
@@ -131,7 +108,7 @@ export default async function Home({searchParams}: T) {
           <span> за месяц </span>
         </div>
         <div className="flex justify-center w-11/12 mr-auto ml-auto">
-          <SideScroll items={renderSlider(trending?.media, 'trending')}/>
+          <SideScroll items={renderSlider(trending.media, 'trending')}/>
         </div>
       </div>
       {searchParams.section && <A params={searchParams} section={'trending'}/>}
@@ -147,29 +124,17 @@ export default async function Home({searchParams}: T) {
       </div>
       {searchParams.section && <A params={searchParams} section={'top'}/>}
 
-      <div className="flex flex-wrap ">
-        {renderMedia(other.media).map((item, index) =>
-          <React.Fragment key={index}>
-            <div className="w-11/12 mr-auto ml-auto flex flex-wrap justify-center">
-              {item.map(info =>
-                <MediaCard key={info?.id} item={info} section={`other_${index}`}/>
-              )}
-            </div>
-            {searchParams.section && <A params={searchParams} section={`other_${index}`}/>}
-          </React.Fragment>
-        )}
-      </div>
-
+      <Other media={other.media} searchParams={searchParams}/>
 
     </main>
   )
 }
 
 
-const media = `query media($id: Int, $type: MediaType, $isAdult: Boolean, $season:  MediaSeason,
-  $seasonYear: Int) 
+const media = `
+query media($type: MediaType, $isAdult: Boolean, $season:  MediaSeason,  $seasonYear: Int) 
   {
-  Media(id: $id, type: $type, isAdult: $isAdult, sort: POPULARITY_DESC, season:$season, seasonYear: $seasonYear
+  Media(type: $type, isAdult: $isAdult, sort: POPULARITY_DESC, season:$season, seasonYear: $seasonYear
   ) {
     id
     type
@@ -258,7 +223,6 @@ async function Test() {
     query: gql`${media}`,
     variables: {
       type: 'ANIME',
-      $isAdult: "false",
       "season": "FALL",
       'seasonYear': 2023,
     }
