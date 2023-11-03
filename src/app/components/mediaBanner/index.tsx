@@ -2,16 +2,10 @@
 import {Media} from "@/generated/graphql";
 import React, {FC, PropsWithChildren, useEffect, useMemo, useState} from "react";
 import {gql, useQuery} from "@apollo/client";
-import {Unit} from "@/types";
 import {AiOutlineClose} from "react-icons/ai";
 import {useRouter} from "next/navigation";
 import Loading from "@/app/loading";
-
-export const dynamic = "force-dynamic";
-
-// type Props = {
-//   Media: Media;
-// };
+import {namedTypes} from "ast-types";
 
 
 type Props = {
@@ -38,21 +32,11 @@ export const A = ({params, section}: Props) => {
     return <div className="test a"/>
   }
 
-
-  if (loading) {
-    return (
-      <div className="w-full text-primary anime  expanded h-[717px] ">
-        <Loading/>
-      </div>
-    )
-  }
-
-  return <MediaBanner data={data}/>
+  return <MediaBanner data={data} loading={loading}/>
 }
 
-
-const media = `query media($id: Int, $type: MediaType, $isAdult: Boolean) {
-  Media(id: $id, type: $type, isAdult: $isAdult) {
+const media = `query media($id: Int, $type: MediaType) {
+  Media(id: $id, type: $type) {
     id
     type
     title {
@@ -132,25 +116,22 @@ const media = `query media($id: Int, $type: MediaType, $isAdult: Boolean) {
 `
 const t = gql`${media}`
 
-export default function MediaBanner({data, isStartBanner}: any) {
+export default function MediaBanner({isStartBanner, data, loading = false}: any) {
+
+
   const {push} = useRouter();
 
-  const {Media} = data as Unit<Media>;
+
   const elementToScroll = React.useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+
     if (elementToScroll.current && !isStartBanner) {
       elementToScroll.current.scrollIntoView({block: 'center', behavior: 'smooth'});
       elementToScroll.current.classList.add('expanded');
     }
-  }, [Media]);
 
-  const tabs = [
-    {label: 'О аниме', content: <div>Content for Tab 1</div>},
-    {label: 'Связаное аниме', content: <div>Content for Tab 3</div>},
-    {label: 'Детали', content: <div>Content for Tab 2</div>},
-  ];
-
+  }, [data, isStartBanner]);
 
   const closeBanner = useMemo(() => {
 
@@ -170,57 +151,80 @@ export default function MediaBanner({data, isStartBanner}: any) {
         <AiOutlineClose size="30"/>
       </div>
     )
-  }, [isStartBanner]);
+  }, [isStartBanner, push]);
+
+
+  const content = useMemo(() => {
+    if (loading || !data) {
+      return <Loading/>
+    }
+
+    return <Banner media={data.Media as Media} closeBanner={closeBanner}/>
+
+
+  }, [closeBanner, data, loading]);
+
+
+  return (
+    <div className={`w-full overflow-hidden relative anim ${isStartBanner && 'expanded'}`} ref={elementToScroll}>
+      {content}
+    </div>
+  )
+}
+
+type y = {
+  closeBanner: React.JSX.Element,
+  media: Media,
+}
+
+const Banner = ({media, closeBanner}: y) => {
 
 
   const [activeTab, setActiveTab] = useState(0);
+
+  const tabs = [
+    {label: 'О аниме', content: <div>Content for Tab 1</div>},
+    {label: 'Связаное аниме', content: <div>Content for Tab 3</div>},
+    {label: 'Детали', content: <div>Content for Tab 2</div>},
+  ];
+
+  console.log(media)
 
   const handleTabClick = (index: number) => {
     setActiveTab(index);
   };
 
 
-  const info = useMemo(() => {
-
-    const array = [Number(Media.averageScore) / 10, Media.seasonYear, Number(Media.favourites) / 100, Media.type, Media.type, Media.popularity];
-
-
-  }, [])
-
   return (
-    <>
-      <div className={`w-full overflow-hidden relative anim ${isStartBanner && 'expanded'}`} ref={elementToScroll}>
-        <div className="relative h-full w-full ">
-          <div className="relative z-10  w-full h-full pl-16 pr-16 pt-3 pb-3"
-               style={{background: 'linear-gradient(90deg, rgb(0, 0, 0) 29%, rgb(255, 255, 255, 0))'}}>
-            <div className="flex w-100 pt-4 justify-center">
-              <Tabs tabs={tabs} callback={handleTabClick} active={activeTab}/>
-            </div>
-            {closeBanner}
-            <TabsContent>
-              <div className=" text-white w-[32%] h-2/3 overflow-hidden flex flex-col justify-center">
-                <div className="d-flex justify-center">
-                  <h1 className="title"
-                      style={{color: Media.coverImage?.color ?? '#fff'}}>{Media.title?.english ?? Media.title?.native}</h1>
-                </div>
-                <div>
-                  {info}
-                </div>
-                <div className="h-[4.5rem] overflow-hidden" dangerouslySetInnerHTML={{__html: Media.description}}/>
-              </div>
-            </TabsContent>
-
-          </div>
-
-          <div className="card w-[100vh] absolute top-0 z-0 p-0 "
-               style={{
-                 background: `url(${Media.bannerImage ?? Media.coverImage?.extraLarge}) no-repeat`,
-               }}
-          />
+    <div className="relative h-full w-full ">
+      <div className="relative z-10  w-full h-full pl-16 pr-16 pt-3 pb-3"
+           style={{background: 'linear-gradient(90deg, rgb(0, 0, 0) 29%, rgb(255, 255, 255, 0))'}}>
+        <div className="flex w-100 pt-4 justify-center">
+          <Tabs tabs={tabs} callback={handleTabClick} active={activeTab}/>
         </div>
+        {closeBanner}
+        <TabsContent>
+          <div className=" text-white w-[32%] h-2/3 overflow-hidden flex flex-col justify-center">
+            <div className="d-flex justify-center">
+              <h1 className="title"
+                  style={{color: media?.coverImage?.color ?? '#fff'}}>{media?.title?.english ?? media?.title?.native}</h1>
+            </div>
+            <div>
+              {/*{info}*/}
+            </div>
+            <div className="h-[4.5rem] overflow-hidden" dangerouslySetInnerHTML={{__html: media?.description ?? ''}}/>
+          </div>
+        </TabsContent>
+
       </div>
-    </>
-  )
+
+      <div className="card w-[100vh] absolute top-0 z-0 p-0 "
+           style={{
+             background: `url(${media?.bannerImage ?? media?.coverImage?.extraLarge}) no-repeat`,
+           }}
+      />
+    </div>
+  );
 }
 
 

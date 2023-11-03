@@ -6,7 +6,7 @@ import {Fragment, useEffect, useMemo, useState} from "react";
 import {TypeSearchParams} from "@/app/types";
 
 function Other({media, searchParams}: {media: Media[], searchParams: TypeSearchParams}) {
-  const initialValue = window !== undefined ? Math.floor(window.innerWidth / 350) : 5
+  const initialValue = typeof window !== "undefined" ? Math.floor(window.innerWidth / 350) : 5;
   const [slice, setSlice] = useState<number>(() => initialValue);
 
   useEffect(() => {
