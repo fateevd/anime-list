@@ -11,7 +11,8 @@ const config: Config = {
       primary: "rgb(228 120 80)",
       nice: '#3bb33b',
       gold: '#ad9c72',
-      sakura: '#f34961'
+      sakura: '#f34961',
+      mainBackground: '#131317'
     },
     extend: {
       backgroundImage: {

@@ -37,6 +37,11 @@ body {
     width: 100%;
 }
 
+input {
+    background-color: inherit;
+}
+
+
 .card {
     background-size: cover !important;
     width: 100%;
