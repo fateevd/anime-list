@@ -9,6 +9,7 @@ import {MediaCard} from "@/app/components/mediaCard";
 import Other from "@/app/components/other";
 import {TypeSearchParams} from "@/app/types";
 import Search from "@/app/components/search";
+import Header from "@/app/components/header";
 
 
 const fragmentMedia: string = `fragment media on Media {
@@ -54,24 +55,6 @@ query (
 ${fragmentMedia}
 `;
 
-
-type  T = {
-  searchParams: {
-    kino: string;
-    type: string;
-    section: string;
-  }
-}
-
-
-type MediaRender = {
-  trending: Unit<Media[]>;
-  season: Unit<Media[]>;
-  top: Unit<Media[]>;
-  other: Unit<Media[]>;
-}
-
-
 const renderSlider = (array: Media[], section: string) => {
   return array && array?.map((item, index) => {
     return (
@@ -103,8 +86,9 @@ export default async function Home({searchParams}: Unit<TypeSearchParams>) {
 
   return (
     <>
-      <Search emptyList={trending.media} />
-
+      <Header>
+        <Search emptyList={trending.media}/>
+      </Header>
       <main className="w-full h-[100vh] mr-auto ml-auto ">
         <Test/>
         <div className="w-[95%] mr-auto ml-auto">
@@ -236,7 +220,7 @@ async function Test() {
 
 
   return (
-    <div className="mt-20">
+    <div className="mt-[55px]">
       <MediaBanner data={data} isStartBanner={true} />
     </div>
   )

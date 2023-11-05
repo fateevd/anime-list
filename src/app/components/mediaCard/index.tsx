@@ -1,8 +1,8 @@
 'use client';
 import React from "react";
 import {AiOutlineHeart, AiOutlineSmile} from "react-icons/ai";
-import {useParams, useRouter, useSearchParams} from "next/navigation";
-import useQueryParams from "@/app/utils/useQueryParams";
+import {useRouter} from "next/navigation";
+import useQueryParams from "@/app/hook/useQueryParams";
 
 type Props = {
   item: any;
@@ -11,11 +11,11 @@ type Props = {
 
 
 export function MediaCard({item, section}: Props) {
-  const {push, } = useRouter()
+  const {push} = useRouter()
   const {kino} = useQueryParams();
   const te = () => push(`?kino=${item.id}&type=${item.type}&section=${section}`, {scroll: false});
 
-  const selected =item.id === Number(kino);
+  const selected = item.id === Number(kino);
 
   return (
     <div className="m-4 w-[270px]  relative t z-1000">
@@ -44,12 +44,12 @@ export function MediaCard({item, section}: Props) {
             className="font-medium text-lg  h-6 overflow-hidden hover:text-white ">{item?.title?.english ?? item.title?.native}</h4>
       </div>
       {selected &&
-        <div className="w-full flex justify-center">
-            <div className="absolute  choosen w-[80%]  h-full bottom-[10px]"></div>
-            <div className="absolute flex justify-center w-full">
-                <div className="step4"></div>
-            </div>
-        </div>
+          <div className="w-full flex justify-center">
+              <div className="absolute  choosen w-[80%]  h-full bottom-[10px]"></div>
+              <div className="absolute flex justify-center w-full">
+                  <div className="step4"></div>
+              </div>
+          </div>
       }
     </div>
   )

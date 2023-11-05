@@ -1,12 +1,12 @@
 "use client";
 
-import {Fragment, useCallback, useEffect, useMemo, useState} from 'react'
+import {Fragment, useMemo, useState} from 'react'
 import {gql, useQuery} from "@apollo/client";
 import {FiPlay} from "react-icons/fi";
 import {Media} from "@/generated/graphql";
 import Loading from "@/app/loading";
 import {Unit} from "@/types";
-import {AiOutlineClose} from "react-icons/ai";
+import useDebounce from "@/app/hook/useDebaunce";
 
 const query = gql`
 query (
@@ -51,15 +51,6 @@ query (
 }
 `
 
-
-function useDebounce(effect: any, dependencies: any, delay: any) {
-  const callback = useCallback(effect, dependencies);
-
-  useEffect(() => {
-    const timeout = setTimeout(callback, delay);
-    return () => clearTimeout(timeout);
-  }, [callback, delay]);
-}
 
 export default function Search({emptyList}: Unit<Partial<Media>[]>) {
   const [search, setSearch] = useState<string>("");
@@ -150,24 +141,6 @@ export default function Search({emptyList}: Unit<Partial<Media>[]>) {
               text-[black]
               z-10"
             placeholder="Найти аниме"/>
-          <div
-            className={`flex absolute  inset-y-0 left-[93%] items-center ${value.length === 0 && 'pointer-events-none'}`}>
-            {value.length === 0 ?
-              <svg className="w-5 h-5 text-[#868686]" fill="currentColor" viewBox="0 0 20 20"
-                   xmlns="http://www.w3.org/2000/svg">
-                <path fill-rule="evenodd"
-                      d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
-                      clip-rule="evenodd"></path>
-              </svg>
-              :
-              <button type="button" className="z-10 cursor-pointer" onClick={(event) => {
-                event.stopPropagation();
-                setValue("")
-              }}>
-                <AiOutlineClose color="#868686"/>
-              </button>
-            }
-          </div>
         </div>
       </div>
       <div className="absolute z-50 w-full h-full mt-1">

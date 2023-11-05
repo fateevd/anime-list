@@ -1,7 +1,7 @@
 "use client"
 import {ReactElement, ReactNode, useCallback, useRef, useState} from "react";
 import {useRouter} from "next/navigation";
-import useQueryParams from "@/app/utils/useQueryParams";
+import useQueryParams from "@/app/hook/useQueryParams";
 
 interface SideScrollProps {
   items: ReactNode[];

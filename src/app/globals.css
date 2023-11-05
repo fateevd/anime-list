@@ -200,3 +200,7 @@ input {
 .title-section {
     font-size: 32px;
 }
+
+.ttt {
+    transition: top .1s;
+}
