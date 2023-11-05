@@ -8,6 +8,7 @@ import SideScroll from "@/app/components/slider";
 import {MediaCard} from "@/app/components/mediaCard";
 import Other from "@/app/components/other";
 import {TypeSearchParams} from "@/app/types";
+import Search from "@/app/components/search";
 
 
 const fragmentMedia: string = `fragment media on Media {
@@ -16,9 +17,11 @@ const fragmentMedia: string = `fragment media on Media {
   title {
     english
     native
+    romaji
   }
   favourites
   meanScore
+  averageScore
    coverImage {
    
     extraLarge
@@ -76,7 +79,7 @@ const renderSlider = (array: Media[], section: string) => {
            className=" flex cursor-pointer items-center relative">
         <h2 className="relative top-list text-primary z-0">{index + 1}</h2>
         <div className="z-10 ml-6">
-          <MediaCard item={item} section={section} />
+          <MediaCard item={item} section={section}/>
         </div>
       </div>
     )
@@ -99,34 +102,37 @@ export default async function Home({searchParams}: Unit<TypeSearchParams>) {
     data as Unit<Unit<Media[]>>
 
   return (
-    <main className="w-full h-[100vh] mr-auto ml-auto ">
-      <Test/>
+    <>
+      <Search emptyList={trending.media} />
 
-      <div className="w-[95%] mr-auto ml-auto">
-        <div className="flex items-center title-section">
-          <h4 className="text-white text-primary mr-2"> Топ-10 </h4>
-          <span> за месяц </span>
+      <main className="w-full h-[100vh] mr-auto ml-auto ">
+        <Test/>
+        <div className="w-[95%] mr-auto ml-auto">
+          <div className="flex items-center title-section">
+            <h4 className="text-white text-primary mr-2"> Топ-10 </h4>
+            <span> за месяц </span>
+          </div>
+          <div className="flex justify-center w-11/12 mr-auto ml-auto">
+            <SideScroll items={renderSlider(trending.media, 'trending')}/>
+          </div>
         </div>
-        <div className="flex justify-center w-11/12 mr-auto ml-auto">
-          <SideScroll items={renderSlider(trending.media, 'trending')}/>
-        </div>
-      </div>
-      {searchParams.section && <A params={searchParams} section={'trending'}/>}
+        {searchParams.section && <A params={searchParams} section={'trending'}/>}
 
-      <div className="w-[95%] mr-auto ml-auto">
-        <div className="flex items-center title-section">
-          <h4 className="text-white text-primary mr-2"> Топ-100 </h4>
-          <span> за все время </span>
+        <div className="w-[95%] mr-auto ml-auto">
+          <div className="flex items-center title-section">
+            <h4 className="text-white text-primary mr-2"> Топ-100 </h4>
+            <span> за все время </span>
+          </div>
+          <div className="flex justify-center w-11/12 mr-auto ml-auto">
+            <SideScroll items={renderSlider(top?.media, 'top')}/>
+          </div>
         </div>
-        <div className="flex justify-center w-11/12 mr-auto ml-auto">
-          <SideScroll items={renderSlider(top?.media, 'top')}/>
-        </div>
-      </div>
-      {searchParams.section && <A params={searchParams} section={'top'}/>}
+        {searchParams.section && <A params={searchParams} section={'top'}/>}
 
-      <Other media={other.media} searchParams={searchParams}/>
+        <Other media={other.media} searchParams={searchParams}/>
 
-    </main>
+      </main>
+    </>
   )
 }
 
