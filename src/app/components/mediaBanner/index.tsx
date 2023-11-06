@@ -188,7 +188,6 @@ const Banner = ({media, closeBanner}: y) => {
     {label: 'Детали', content: <div>Content for Tab 2</div>},
   ];
 
-  console.log(media)
 
   const handleTabClick = (index: number) => {
     setActiveTab(index);

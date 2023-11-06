@@ -1,7 +1,9 @@
 import './globals.css'
 import type {Metadata} from 'next'
 import GraphProvider from "@/graphql/GraphProvider";
-import Script from 'next/script';
+import Search from "@/app/components/search";
+import Header from "@/app/components/header";
+import React from "react";
 
 
 export const metadata: Metadata = {
@@ -10,16 +12,22 @@ export const metadata: Metadata = {
 }
 
 
-export default async function RootLayout({children}: {
-  children: React.ReactNode
+export default async function RootLayout({children, params}: {
+  children: React.ReactNode,
+  params: any
 }) {
   return (
     <html lang="ru">
-    <>
-      <body>
-      <GraphProvider>{children}</GraphProvider>
-      </body>
-    </>
+    <body>
+    <GraphProvider>
+      <>
+        <Header>
+          <Search emptyList={[]}/>
+        </Header>
+        {children}
+      </>
+    </GraphProvider>
+    </body>
     </html>
   )
 }

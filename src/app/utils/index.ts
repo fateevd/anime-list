@@ -1,54 +1,83 @@
+import {MediaType} from "@/generated/graphql";
+
 interface IDate {
-  currentSeason: Season;
-  currentYear: number;
+  season: Season;
+  year: number;
 }
 
-type Season = 'Winter' |
-  'Spring' |
-  'Summer' |
-  'Fall';
-
+type Season = 'WINTER' | 'SPRING' | 'SUMMER'| 'FALL';
 const seasons: Season[] = [
-  'Winter',
-  'Spring',
-  'Summer',
-  'Fall',
+  'WINTER',
+  'SPRING',
+  'SUMMER',
+  'FALL',
 ];
 
 class DateInfo implements IDate {
-  public season: number;
+  public season: Season;
   public year: number;
-  public month: number;
 
   constructor() {
     const currentDate = new Date();
     const currentMonth = currentDate.getMonth();
-    this.season = Math.floor((currentMonth % 12) / 3);
+    this.season = seasons[Math.floor((currentMonth % 12) / 3)];
     this.year = currentDate.getFullYear();
-    this.month = currentDate.getMonth();
   }
 
-  get currentSeason(): Season {
-    return seasons[this.season];
-  }
-
-  get infoDate() {
-    const nextSeason = (this.season + 1) % 4
+  get date() {
     return {
-      seasonYear: this.year,
-      season: this.currentSeason,
+      year: this.year,
+      season: this.season,
     }
   }
+}
 
-  nextYear(offset = 1) {
-    return this.year + offset;
+
+class Variables {
+  public result: unknown;
+
+  constructor(id?: number, type?: MediaType, needDate?: boolean) {
+    const {date} = new DateInfo();
+    this.result = this.findVariables(id, type, date, needDate);
   }
+  //TODO: переделать как время будет
+  findVariables(id?: number, type?: MediaType, date?: IDate, needDate?: boolean) {
 
-  prevYear(offset = 1) {
-    return this.year - offset;
+    if (needDate) {
+
+      if (id) {
+        return {
+          type: !type ? "ANIME" : type,
+          id,
+          ...date,
+        }
+      }
+
+      return {
+        type: !type ? "ANIME" : type,
+        ...date
+      }
+    }
+
+    if (!id && type === "MANGA") {
+      return {
+        type,
+      }
+    }
+
+    return {
+      id,
+      type,
+    }
+
+
+  };
+
+
+  get listVariables() {
+    return this.result;
   }
-
 
 }
 
-export const {nextYear, prevYear, infoDate, currentSeason} = new DateInfo()
+export default Variables;

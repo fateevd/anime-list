@@ -3,10 +3,11 @@
 import {Fragment, useMemo, useState} from 'react'
 import {gql, useQuery} from "@apollo/client";
 import {FiPlay} from "react-icons/fi";
-import {Media} from "@/generated/graphql";
+import {Media, MediaType} from "@/generated/graphql";
 import Loading from "@/app/loading";
 import {Unit} from "@/types";
 import useDebounce from "@/app/hook/useDebaunce";
+import {useRouter} from "next/navigation";
 
 const query = gql`
 query (
@@ -54,7 +55,7 @@ query (
 
 export default function Search({emptyList}: Unit<Partial<Media>[]>) {
   const [search, setSearch] = useState<string>("");
-
+  const {push} = useRouter();
   const {data, loading} = useQuery(query, {
     variables: {
       "sort": "SEARCH_MATCH",
@@ -89,6 +90,11 @@ export default function Search({emptyList}: Unit<Partial<Media>[]>) {
 
     const text = search.length === 0 ? 'Топ 10 аниме за месяц' : 'Амиме и манга';
 
+    const goTo = (type: MediaType, id: number) => {
+      console.log(type, id)
+      push(`/${type}/${id}`)
+    }
+
     return (
       <>
         <li className="text-[12px] mt-1 ml-4 mb-1.5 text-[#868686] ">{text}</li>
@@ -96,7 +102,7 @@ export default function Search({emptyList}: Unit<Partial<Media>[]>) {
           info?.map(item =>
             <Fragment key={item.id}>
               <li className="pr-3 pl-3 flex justify-between items-center cursor-pointer hover:bg-[#efeeee]"
-                  aria-label="link" onClick={() => console.log(item.id)}>
+                  aria-label="link" onClick={() => goTo(item.type as MediaType,item.id)}>
                 <div className="flex items-center ">
                   <img className="mr-2.5 p-1.5" width={45} src={item?.coverImage?.medium ?? ''}
                        alt={`banner ${item?.title?.english}`}/>
@@ -120,7 +126,7 @@ export default function Search({emptyList}: Unit<Partial<Media>[]>) {
         }
       </>
     )
-  }, [data?.Page?.media, emptyList, loading, search.length])
+  }, [data?.Page?.media, emptyList, loading, push, search.length])
 
 
   return (
@@ -129,7 +135,7 @@ export default function Search({emptyList}: Unit<Partial<Media>[]>) {
         <label htmlFor="simple-search" className="sr-only">Search</label>
         <div className="relative w-full">
           <input
-            onBlur={() => setFocused(false)}
+            // onBlur={() => setFocused(false)}
             onFocus={() => setFocused(true)}
             type="text" id="simple-search" value={value} onChange={(e) => setValue(e.target.value)}
             className="outline-none bg-gray-50 border
