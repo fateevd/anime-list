@@ -1,13 +1,13 @@
 "use client";
 
-import {Fragment, useMemo, useState} from 'react'
+import React, {Fragment, useMemo, useState} from 'react'
 import {gql, useQuery} from "@apollo/client";
 import {FiPlay} from "react-icons/fi";
-import {Media, MediaType} from "@/generated/graphql";
-import Loading from "@/app/loading";
-import {Unit} from "@/types";
+import {Media} from "@/generated/graphql";
 import useDebounce from "@/app/hook/useDebaunce";
-import {useRouter} from "next/navigation";
+import store from "@/app/store";
+import Link from "next/link";
+import storeList from "@/app/store/searchList";
 
 const query = gql`
 query (
@@ -53,9 +53,12 @@ query (
 `
 
 
-export default function Search({emptyList}: Unit<Partial<Media>[]>) {
+export default function Search() {
   const [search, setSearch] = useState<string>("");
-  const {push} = useRouter();
+  const emptyList = store(state => state.trending);
+
+  const {isOpenList, open, close} = storeList();
+
   const {data, loading} = useQuery(query, {
     variables: {
       "sort": "SEARCH_MATCH",
@@ -65,10 +68,6 @@ export default function Search({emptyList}: Unit<Partial<Media>[]>) {
 
 
   const [value, setValue] = useState<string>("")
-
-
-  const [focused, setFocused] = useState<boolean>(false);
-
 
   useDebounce(() => {
     setSearch(value);
@@ -85,15 +84,10 @@ export default function Search({emptyList}: Unit<Partial<Media>[]>) {
     }
 
     if (loading) {
-      return <Loading/>
+      return <></>
     }
 
     const text = search.length === 0 ? 'Топ 10 аниме за месяц' : 'Амиме и манга';
-
-    const goTo = (type: MediaType, id: number) => {
-      console.log(type, id)
-      push(`/${type}/${id}`)
-    }
 
     return (
       <>
@@ -101,32 +95,35 @@ export default function Search({emptyList}: Unit<Partial<Media>[]>) {
         {
           info?.map(item =>
             <Fragment key={item.id}>
-              <li className="pr-3 pl-3 flex justify-between items-center cursor-pointer hover:bg-[#efeeee]"
-                  aria-label="link" onClick={() => goTo(item.type as MediaType,item.id)}>
-                <div className="flex items-center ">
-                  <img className="mr-2.5 p-1.5" width={45} src={item?.coverImage?.medium ?? ''}
-                       alt={`banner ${item?.title?.english}`}/>
-                  <div className="mt-0.5">
-                    <h3>{item?.title?.english ?? item?.title?.userPreferred}</h3>
-                    <div className="flex text-xs ">
-                      <p className="font-medium mr-1">{item?.averageScore ? item?.averageScore / 10 : 'Нет оценок'}</p>
-                      <p className="text-[#868686]">{item?.type?.toLowerCase()}</p>
-                      <p className="text-[#868686]">{item?.seasonYear}</p>
+              <Link href={`/${item.type}/${item.id}`} onClick={console.log}>
+                <li className="pr-3 pl-3 flex justify-between items-center cursor-pointer hover:bg-[#efeeee]"
+                >
+                  <div className="flex items-center ">
+                    <img className="mr-2.5 p-1.5" width={45} src={item?.coverImage?.medium ?? ''}
+                         alt={`banner ${item?.title?.english}`}/>
+                    <div className="mt-0.5">
+                      <h3>{item?.title?.english ?? item?.title?.userPreferred}</h3>
+                      <div className="flex text-xs ">
+                        <p
+                          className="font-medium mr-1">{item?.averageScore ? item?.averageScore / 10 : 'Нет оценок'}</p>
+                        <p className="text-[#868686]">{item?.type?.toLowerCase()}</p>
+                        <p className="text-[#868686]">{item?.seasonYear}</p>
+                      </div>
                     </div>
                   </div>
-                </div>
-                <div
-                  className="text-xs bg-primary pr-1.5 pl-1.5 pt-1 pb-1 text-[white] rounded-xl flex items-center">
-                  <FiPlay/>
-                  <p className="ml-0.5">Смотреть</p>
-                </div>
-              </li>
+                  <div
+                    className="text-xs bg-primary pr-1.5 pl-1.5 pt-1 pb-1 text-[white] rounded-xl flex items-center">
+                    <FiPlay/>
+                    <p className="ml-0.5">Смотреть</p>
+                  </div>
+                </li>
+              </Link>
             </Fragment>
           )
         }
       </>
     )
-  }, [data?.Page?.media, emptyList, loading, push, search.length])
+  }, [data?.Page?.media, emptyList, loading, search.length])
 
 
   return (
@@ -135,8 +132,10 @@ export default function Search({emptyList}: Unit<Partial<Media>[]>) {
         <label htmlFor="simple-search" className="sr-only">Search</label>
         <div className="relative w-full">
           <input
-            // onBlur={() => setFocused(false)}
-            onFocus={() => setFocused(true)}
+            onBlur={() => setTimeout(() => {
+              close();
+            }, 100)}
+            onFocus={open}
             type="text" id="simple-search" value={value} onChange={(e) => setValue(e.target.value)}
             className="outline-none bg-gray-50 border
              text-gray-900 text-sm rounded-lg
@@ -150,10 +149,10 @@ export default function Search({emptyList}: Unit<Partial<Media>[]>) {
         </div>
       </div>
       <div className="absolute z-50 w-full h-full mt-1">
-        {focused &&
-            <ul className={`w-full pt-3 pb-3 rounded-2xl text-[black] bg-[white] ${loading && 'h-[670px]'}`}>
-              {list}
-            </ul>
+        {isOpenList &&
+          <ul className={`w-full pt-3 pb-3 rounded-2xl text-[black] bg-[white] ${loading && 'h-[670px]'}`}>
+            {list}
+          </ul>
         }
       </div>
     </div>

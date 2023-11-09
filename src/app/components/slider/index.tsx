@@ -1,13 +1,15 @@
 "use client"
-import {ReactElement, ReactNode, useCallback, useRef, useState} from "react";
+import {ReactNode, useCallback, useEffect, useRef, useState} from "react";
 import {useRouter} from "next/navigation";
-import useQueryParams from "@/app/hook/useQueryParams";
+import store from "@/app/store";
+import {Media} from "@/generated/graphql";
 
 interface SideScrollProps {
   items: ReactNode[];
+  data?: unknown[];
 }
 
-function SideScroll({items}: SideScrollProps) {
+function SideScroll({items, data}: SideScrollProps) {
   const [scrollX, setScrollX] = useState(0);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const router = useRouter()
@@ -23,6 +25,22 @@ function SideScroll({items}: SideScrollProps) {
       setScrollX(newScrollX);
     }
   };
+
+  const {add, replace} = store(state => state);
+
+  useEffect(() => {
+    if (data) {
+      add(data as Partial<Media>[])
+    }
+
+
+    return () => {
+      if (data) {
+        replace()
+      }
+    }
+
+  }, [replace, add, data]);
 
   const scrollRight = () => {
     const container = scrollContainerRef.current;
@@ -62,7 +80,6 @@ function SideScroll({items}: SideScrollProps) {
             <div className="scroll-item " key={index}>
               {item}
             </div>
-
           )}
         </div>
       </div>

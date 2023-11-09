@@ -69,9 +69,8 @@ const renderSlider = (array: Media[], section: string) => {
 
 
 export default async function Main({searchParams, id, type}: any) {
-  console.log({type})
   const {listVariables} = new Variables(id, type, true);
-  console.log(1 ,{listVariables, type, id})
+
   const {data} = await useQuery({
       query: gql`${mediaList}`,
       variables: listVariables as OperationVariables,
@@ -91,7 +90,7 @@ export default async function Main({searchParams, id, type}: any) {
             <span> за месяц </span>
           </div>
           <div className="flex justify-center w-11/12 mr-auto ml-auto">
-            <SideScroll items={renderSlider(trending.media, 'trending')}/>
+            <SideScroll data={trending.media} items={renderSlider(trending.media, 'trending')}/>
           </div>
         </div>
         {searchParams.section && <A params={searchParams} section={'trending'}/>}
@@ -203,10 +202,7 @@ query media($id: Int, $type: MediaType, $isAdult: Boolean, $season:  MediaSeason
 `
 
 async function Test({id, type}: any) {
-  console.log({id, type})
   const {listVariables} = new Variables(id, type, false);
-  console.log(2,{listVariables})
-
 
   const {data} = await useQuery({
     query: gql`${media}`,
