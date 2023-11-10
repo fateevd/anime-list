@@ -56,7 +56,60 @@ input {
 
 .title {
     font-size: 3rem;
+    transform: translateY(190px);
     font-family: 'Ninja Naruto';
+    transition: transform 1.5s ease-out;
+}
+
+.not-main {
+    animation: shrink 1s forwards;
+}
+
+.is-main {
+    animation: shrink1 1s forwards;
+    width: 45%;
+}
+
+@keyframes shrink1 {
+    from {
+        font-size: 2rem;
+        transform: translateY(50px);
+    }
+    to {
+        font-size: 3rem;
+        transform: translateY(190px);
+        width: 45%;
+    }
+}
+
+
+@keyframes shrink {
+    from {
+        font-size: 3rem;
+        transform: translateY(190px);
+    }
+    to {
+        width: 500px;
+        font-size: 1.7rem;
+        transform: translateY(50px);
+    }
+}
+
+
+@keyframes slideInFromBottom {
+    0% {
+        transform: translateY(100%);
+        opacity: 0;
+    }
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Применение анимации к тексту */
+.myText {
+    animation: slideInFromBottom 1s ease-in-out; /* Продолжительность, тип анимации */
 }
 
 .t {
@@ -190,7 +243,8 @@ input {
 }
 
 .step4 {
-    border: 10px solid transparent; border-top: 10px solid #ffffff;
+    border: 10px solid transparent;
+    border-top: 10px solid #ffffff;
 }
 
 .title-section h4 {

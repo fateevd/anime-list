@@ -161,7 +161,6 @@ export default function MediaBanner({isStartBanner, data, loading = false}: any)
 
     return <Banner media={data.Media as Media} closeBanner={closeBanner}/>
 
-
   }, [closeBanner, data, loading]);
 
 
@@ -183,37 +182,68 @@ const Banner = ({media, closeBanner}: y) => {
   const [activeTab, setActiveTab] = useState(0);
 
   const tabs = [
-    {label: 'О аниме', content: <div>Content for Tab 1</div>},
-    {label: 'Связаное аниме', content: <div>Content for Tab 3</div>},
-    {label: 'Детали', content: <div>Content for Tab 2</div>},
+    {
+      label: 'Об аниме', content: <TabsContent key={1}>
+        <div className=" text-white w-[32%] h-2/3 overflow-hidden flex flex-col justify-center">
+          <div className="d-flex justify-center">
+          </div>
+          <div>
+            {/*{info}*/}
+          </div>
+          <div className="h-[4.5rem] overflow-hidden" dangerouslySetInnerHTML={{__html: media?.description ?? ''}}/>
+        </div>
+      </TabsContent>
+    },
+    {
+      label: 'Связаное аниме', content: <TabsContent key={2}>
+        <div className=" text-white w-[32%] h-2/3 overflow-hidden flex flex-col justify-center">
+          <div className="d-flex justify-center">
+          </div>
+          <div>
+            {/*{info}*/}
+          </div>
+          <div className="h-[4.5rem] overflow-hidden" dangerouslySetInnerHTML={{__html: media?.description ?? ''}}/>
+        </div>
+      </TabsContent>
+    },
+    {
+      label: 'Детали', content: <TabsContent key={3}>
+        <div className=" text-white w-[32%] h-2/3 overflow-hidden flex flex-col justify-center">
+          <div className="d-flex justify-center">
+          </div>
+          <div>
+            {/*{info}*/}
+          </div>
+          <div className="h-[4.5rem] overflow-hidden" dangerouslySetInnerHTML={{__html: media?.description ?? ''}}/>
+        </div>
+      </TabsContent>
+    },
   ];
 
+  // console.log(tabContainer)
 
   const handleTabClick = (index: number) => {
     setActiveTab(index);
   };
 
+  const style = activeTab ? {
+    backdropFilter: 'blur(12px)',
+    background: 'radial-gradient(circle, rgba(237,237,237,0.9416141456582633) 0%, rgba(0,0,0,0.6474964985994398) 0%)',
+  } : {
+    background: 'linear-gradient(90deg, rgb(0, 0, 0) 29%, rgb(255, 255, 255, 0))',
+  }
 
   return (
     <div className="relative h-full w-full ">
       <div className="relative z-10  w-full h-full pl-16 pr-16 pt-3 pb-3"
-           style={{background: 'linear-gradient(90deg, rgb(0, 0, 0) 29%, rgb(255, 255, 255, 0))'}}>
+           style={style}>
         <div className="flex w-100 pt-4 justify-center">
           <Tabs tabs={tabs} callback={handleTabClick} active={activeTab}/>
         </div>
         {closeBanner}
-        <TabsContent>
-          <div className=" text-white w-[32%] h-2/3 overflow-hidden flex flex-col justify-center">
-            <div className="d-flex justify-center">
-              <h1 className="title"
-                  style={{color: media?.coverImage?.color ?? '#fff'}}>{media?.title?.english ?? media?.title?.native}</h1>
-            </div>
-            <div>
-              {/*{info}*/}
-            </div>
-            <div className="h-[4.5rem] overflow-hidden" dangerouslySetInnerHTML={{__html: media?.description ?? ''}}/>
-          </div>
-        </TabsContent>
+        <h1 className={`title ${activeTab ? 'not-main' : 'is-main'}`}
+            style={{color: media?.coverImage?.color ?? '#fff'}}>{media?.title?.english ?? media?.title?.native}</h1>
+        {tabs[activeTab].content}
 
       </div>
 
@@ -258,7 +288,7 @@ const Tabs: FC<TabsProps> = ({tabs, active, callback}) => {
 
 const TabsContent: FC<PropsWithChildren> = ({children}) => {
   return (
-    <div className="tab-content h-full">
+    <div className="tab-content h-full myText">
       {children}
     </div>
   );
