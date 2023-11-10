@@ -1,7 +1,7 @@
 import {gql, OperationVariables} from "@apollo/client";
 import {Media} from "@/generated/graphql";
 import {Unit} from "@/types";
-import {useQuery} from "@/graphql/useQuery";
+import useServerQuery from "@/app/hook/useServerQuery";
 import React from "react";
 import MediaBanner, {A} from "@/app/components/mediaBanner";
 import SideScroll from "@/app/components/slider";
@@ -28,7 +28,7 @@ const fragmentMedia: string = `fragment media on Media {
     medium
     color
   }
-}`
+}`;
 
 const mediaList = `
 query (
@@ -71,8 +71,8 @@ const renderSlider = (array: Media[], section: string) => {
 export default async function Main({searchParams, id, type}: any) {
   const {listVariables} = new Variables(id, type, true);
 
-  const {data} = await useQuery({
-      query: gql`${mediaList}`,
+  const {data} = await useServerQuery({
+      query: mediaList,
       variables: listVariables as OperationVariables,
     }
   );
@@ -114,7 +114,7 @@ export default async function Main({searchParams, id, type}: any) {
 }
 
 
-const media = `
+const query = `
 query media($id: Int, $type: MediaType, $isAdult: Boolean, $season:  MediaSeason,  $seasonYear: Int) 
   {
   Media(id: $id, type: $type, isAdult: $isAdult, sort: POPULARITY_DESC, season:$season, seasonYear: $seasonYear
@@ -204,8 +204,8 @@ query media($id: Int, $type: MediaType, $isAdult: Boolean, $season:  MediaSeason
 async function Test({id, type}: any) {
   const {listVariables} = new Variables(id, type, false);
 
-  const {data} = await useQuery({
-    query: gql`${media}`,
+  const {data} = await useServerQuery({
+    query,
     variables: listVariables as OperationVariables,
   });
 

@@ -1,15 +1,15 @@
 "use client";
 
 import React, {Fragment, useMemo, useState} from 'react'
-import {gql, useQuery} from "@apollo/client";
 import {FiPlay} from "react-icons/fi";
 import {Media} from "@/generated/graphql";
 import useDebounce from "@/app/hook/useDebaunce";
 import store from "@/app/store";
 import Link from "next/link";
 import storeList from "@/app/store/searchList";
+import useClientQuery from "@/app/hook/useClientQuery";
 
-const query = gql`
+const query = `
 query (
   $page: Int = 1
   $search: String
@@ -59,7 +59,8 @@ export default function Search() {
 
   const {isOpenList, open, close} = storeList();
 
-  const {data, loading} = useQuery(query, {
+  const {data, loading} = useClientQuery({
+    query,
     variables: {
       "sort": "SEARCH_MATCH",
       "search": search,

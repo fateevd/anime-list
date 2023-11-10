@@ -1,11 +1,10 @@
 "use client";
 import {Media} from "@/generated/graphql";
 import React, {FC, PropsWithChildren, useEffect, useMemo, useState} from "react";
-import {gql, useQuery} from "@apollo/client";
 import {AiOutlineClose} from "react-icons/ai";
 import {useRouter} from "next/navigation";
 import Loading from "@/app/loading";
-import {namedTypes} from "ast-types";
+import useClientQuery from "@/app/hook/useClientQuery";
 
 
 type Props = {
@@ -18,24 +17,7 @@ type Props = {
 };
 
 
-export const A = ({params, section}: Props) => {
-
-  const {data, loading} = useQuery(t, {
-    variables: {
-      type: params.type,
-      id: params.kino,
-      $isAdult: "false",
-    }
-  });
-
-  if (params.section !== section) {
-    return <div className="test a"/>
-  }
-
-  return <MediaBanner data={data} loading={loading}/>
-}
-
-const media = `query media($id: Int, $type: MediaType) {
+const query = `query media($id: Int, $type: MediaType) {
   Media(id: $id, type: $type) {
     id
     type
@@ -114,7 +96,26 @@ const media = `query media($id: Int, $type: MediaType) {
   }
 }
 `
-const t = gql`${media}`
+
+
+export const A = ({params, section}: Props) => {
+
+  const {data, loading} = useClientQuery({
+    query,
+    variables: {
+      type: params.type,
+      id: params.kino,
+    }
+  });
+
+  if (params.section !== section) {
+    return <div className="test a"/>
+  }
+
+  return <MediaBanner data={data} loading={loading}/>
+}
+
+
 
 export default function MediaBanner({isStartBanner, data, loading = false}: any) {
 
