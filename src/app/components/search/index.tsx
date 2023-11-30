@@ -8,6 +8,8 @@ import store from "@/app/store";
 import Link from "next/link";
 import storeList from "@/app/store/searchList";
 import useClientQuery from "@/app/hook/useClientQuery";
+import getTitle from "@/app/utils/getTitle";
+import {fragmentTitle} from "@/app/fragment";
 
 const query = `
 query (
@@ -32,10 +34,8 @@ query (
       sort: $sort
     ) {
       id
-      title {
-        userPreferred
-        english
-        romaji
+       title {
+        ...TitleFragment
       }
       coverImage {
         medium
@@ -50,6 +50,7 @@ query (
     }
   }
 }
+${fragmentTitle}
 `
 
 
@@ -66,7 +67,6 @@ export default function Search() {
       "search": search,
     },
   });
-
 
   const [value, setValue] = useState<string>("")
 
@@ -96,14 +96,14 @@ export default function Search() {
         {
           info?.map(item =>
             <Fragment key={item.id}>
-              <Link href={`/${item.type}/${item.id}`} onClick={console.log}>
+              <Link href={`/${item.type}/${item.id}`}>
                 <li className="pr-3 pl-3 flex justify-between items-center cursor-pointer hover:bg-[#efeeee]"
                 >
                   <div className="flex items-center ">
                     <img className="mr-2.5 p-1.5" width={45} src={item?.coverImage?.medium ?? ''}
                          alt={`banner ${item?.title?.english}`}/>
                     <div className="mt-0.5">
-                      <h3>{item?.title?.english ?? item?.title?.userPreferred}</h3>
+                      <h3>{getTitle(item.title ?? undefined)}</h3>
                       <div className="flex text-xs ">
                         <p
                           className="font-medium mr-1">{item?.averageScore ? item?.averageScore / 10 : 'Нет оценок'}</p>

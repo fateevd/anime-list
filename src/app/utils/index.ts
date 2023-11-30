@@ -5,7 +5,7 @@ interface IDate {
   year: number;
 }
 
-type Season = 'WINTER' | 'SPRING' | 'SUMMER'| 'FALL';
+type Season = 'WINTER' | 'SPRING' | 'SUMMER' | 'FALL';
 const seasons: Season[] = [
   'WINTER',
   'SPRING',
@@ -13,7 +13,7 @@ const seasons: Season[] = [
   'FALL',
 ];
 
-class DateInfo implements IDate {
+export class DateInfo implements IDate {
   public season: Season;
   public year: number;
 
@@ -22,6 +22,28 @@ class DateInfo implements IDate {
     const currentMonth = currentDate.getMonth();
     this.season = seasons[Math.floor((currentMonth % 12) / 3)];
     this.year = currentDate.getFullYear();
+  }
+
+  formatStartZero(date: number[]): string {
+    const result = [];
+    for (const number of date) {
+      if (number === null) {
+        break;
+      }
+
+      if (number < 10) {
+        result.push(`0${number}`);
+        continue;
+      }
+
+      result.push(number);
+    }
+
+    if (result.length === 0) {
+      return 'еще выходит';
+    }
+
+    return result.join('.');
   }
 
   get date() {
@@ -40,6 +62,7 @@ class Variables {
     const {date} = new DateInfo();
     this.result = this.findVariables(id, type, date, needDate);
   }
+
   //TODO: переделать как время будет
   findVariables(id?: number, type?: MediaType, date?: IDate, needDate?: boolean) {
 

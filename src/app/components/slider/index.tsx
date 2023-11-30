@@ -10,7 +10,7 @@ interface SideScrollProps {
 }
 
 function SideScroll({items, data}: SideScrollProps) {
-  const [scrollX, setScrollX] = useState(0);
+  const [scrollX, setScrollX] = useState<number>(0);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const router = useRouter()
 
@@ -26,6 +26,7 @@ function SideScroll({items, data}: SideScrollProps) {
     }
   };
 
+  const [visible, setVisible] = useState(false);
   const {add, replace} = store(state => state);
 
   useEffect(() => {
@@ -33,10 +34,13 @@ function SideScroll({items, data}: SideScrollProps) {
       add(data as Partial<Media>[])
     }
 
+    setTimeout(() => {
+      setVisible((scrollContainerRef?.current?.scrollWidth || 0) > window.innerWidth);
+    }, 200);
 
     return () => {
       if (data) {
-        replace()
+        replace();
       }
     }
 
@@ -67,6 +71,7 @@ function SideScroll({items, data}: SideScrollProps) {
   }, [scrollContainerRef, scrollX]);
 
 
+
   return (
     <div className="side-scroll ">
       <div className={scrollX === 0 ? 'hidden' : ''}>
@@ -77,13 +82,13 @@ function SideScroll({items, data}: SideScrollProps) {
       <div className="overflow-hidden">
         <div className="scroll-container" style={{transform: `translateX(${scrollX}px)`}} ref={scrollContainerRef}>
           {items.map((item, index) =>
-            <div className="scroll-item " key={index}>
+            <div className="scroll-item  " key={index}>
               {item}
             </div>
           )}
         </div>
       </div>
-      <div className={max()}>
+      <div className={`${max()} ${visible ? '' : 'hidden'}`}>
         <button className="scroll-button left" onClick={scrollRight}>
           &lt;
         </button>

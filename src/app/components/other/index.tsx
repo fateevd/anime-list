@@ -2,7 +2,7 @@
 import {MediaCard} from "@/app/components/mediaCard";
 import {A} from "@/app/components/mediaBanner";
 import {Media} from "@/generated/graphql";
-import {Fragment, useEffect, useMemo, useState} from "react";
+import {Fragment, useEffect, useLayoutEffect, useMemo, useState} from "react";
 import {TypeSearchParams} from "@/app/types";
 
 function Other({media, searchParams}: {media: Media[], searchParams: TypeSearchParams}) {

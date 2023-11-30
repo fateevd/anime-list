@@ -55,19 +55,20 @@ input {
 
 
 .title {
-    font-size: 3rem;
-    transform: translateY(190px);
+    font-size: 2.7rem;
     font-family: 'Ninja Naruto';
-    transition: transform 1.5s ease-out;
+    transition: transform .9s ease-out;
+    position: relative;
 }
 
 .not-main {
     animation: shrink 1s forwards;
+
 }
 
 .is-main {
     animation: shrink1 1s forwards;
-    width: 45%;
+    width: 70%;
 }
 
 @keyframes shrink1 {
@@ -77,8 +78,11 @@ input {
     }
     to {
         font-size: 3rem;
-        transform: translateY(190px);
+        transform: translateY(135px);
         width: 45%;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 }
 
@@ -86,7 +90,8 @@ input {
 @keyframes shrink {
     from {
         font-size: 3rem;
-        transform: translateY(190px);
+        transform: translateY(135px);
+
     }
     to {
         width: 500px;
@@ -109,17 +114,21 @@ input {
 
 /* Применение анимации к тексту */
 .myText {
-    animation: slideInFromBottom 1s ease-in-out; /* Продолжительность, тип анимации */
+    animation: slideInFromBottom .7s ease-in-out;
 }
 
 .t {
     cursor: pointer;
-    transition: transform .5s ease 0s, opacity 0s ease 0.4s;
 }
 
 .t:hover {
     transform: scale(1.20);
-    transition: transform .5s ease 0s;
+    transition: transform .5s ease-in-out;
+}
+
+.t:not(:hover) {
+    transform: scale(1);
+    transition: transform .5s ease-in-out;
 }
 
 .anim, .test {
@@ -257,4 +266,72 @@ input {
 
 .ttt {
     transition: top .1s;
+}
+
+.text-info {
+    width: 0;
+    overflow: hidden;
+    transition: width 1.2s ease;
+}
+
+.info-block {
+    width: 220px;
+    transition: width 1.5s ease;
+}
+
+.info-block::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 200px;
+    width: 200px;
+    height: 200px;
+}
+
+.info-block:hover {
+    width: 400px;
+}
+
+.info-block:hover .text-info {
+    width: 200px;
+}
+
+.evalution {
+    display: flex;
+    align-items: center;
+    background-color: #1f1f1f;
+    color: white;
+    justify-content: space-around;
+    border-radius: 20px;
+    padding: 0 5px;
+    width: 430px;
+}
+.evalution li {
+    padding: 8px 10px;
+    cursor: pointer;
+    transition: transform 2s ease-in-out;
+}
+
+.evalution li:hover {
+    color: blue;
+    scale: 1.35;
+}
+
+
+.evalution li:nth-child(-n+4):hover {
+    color: red;
+}
+
+.evalution li:nth-child(n+8):hover {
+    color: green;
+}
+
+
+
+.evalution li:first-child {
+    border-radius: 20px 0;
+}
+
+.evalution li:last-child {
+    border-radius: 20px;
 }

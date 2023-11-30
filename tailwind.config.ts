@@ -9,10 +9,13 @@ const config: Config = {
   theme: {
     colors: {
       primary: "rgb(228 120 80)",
+      white: "#fff",
       nice: '#3bb33b',
-      gold: '#ad9c72',
+      gold: '#FFD700',
       sakura: '#f34961',
-      mainBackground: '#131317'
+      mainBackground: '#131317',
+      youtube: '#ff0000',
+      gray: '#8c9296',
     },
     extend: {
       backgroundImage: {

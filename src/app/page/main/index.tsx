@@ -8,48 +8,35 @@ import SideScroll from "@/app/components/slider";
 import {MediaCard} from "@/app/components/mediaCard";
 import Other from "@/app/components/other";
 import Variables from "@/app/utils";
+import {fragmentAllInfoOfMedia, fragmentMedia, fragmentTitle} from "@/app/fragment";
 
-
-const fragmentMedia: string = `fragment media on Media {
-  id,
-  type
-  title {
-    english
-    native
-    romaji
-  }
-  favourites
-  meanScore
-  averageScore
-   coverImage {
-   
-    extraLarge
-    large
-    medium
-    color
-  }
-}`;
 
 const mediaList = `
 query (
   $type: MediaType
 ){
     trending: Page(page: 1, perPage: 10) {
-      media(sort: TRENDING_DESC, type: $type, isAdult: false) {
+      media(sort: TRENDING_DESC, type: $type) {
         ...media
       }
     }
     top: Page(page: 1, perPage: 10) {
-      media(sort: SCORE_DESC, type: $type, isAdult: false) {
-      ...media
+      media(sort: SCORE_DESC, type: $type) {
+        ...media
       }
     }
-    other:Page(page: 1, perPage: 100){
-    media(type:$type) {
+    popular: Page(page: 1, perPage: 10) {
+      media(sort: POPULARITY_DESC, type: $type) {
+        ...media
+      }
+    }
+    other:Page(page: 1, perPage: 30){
+      media(type:$type) {
       ...media
     }
   }
 }
+${fragmentTitle}
 ${fragmentMedia}
 `;
 
@@ -77,7 +64,7 @@ export default async function Main({searchParams, id, type}: any) {
     }
   );
 
-  const {trending, other, top} =
+  const {trending, other, top,popular, } =
     data as Unit<Unit<Media[]>>
 
   return (
@@ -107,7 +94,17 @@ export default async function Main({searchParams, id, type}: any) {
         {searchParams.section && <A params={searchParams} section={'top'}/>}
 
         <Other media={other.media} searchParams={searchParams}/>
-
+        
+        <div className="w-[95%] mr-auto ml-auto">
+          <div className="flex items-center title-section">
+            <h4 className="text-white text-primary mr-2"> </h4>
+            <span>  Популярное за все время </span>
+          </div>
+          <div className="flex justify-center w-11/12 mr-auto ml-auto">
+            <SideScroll items={renderSlider(popular?.media, 'popular')}/>
+          </div>
+        </div>
+        {searchParams.section && <A params={searchParams} section={'popular'}/>}
       </main>
     </>
   )
@@ -115,90 +112,13 @@ export default async function Main({searchParams, id, type}: any) {
 
 
 const query = `
-query media($id: Int, $type: MediaType, $isAdult: Boolean, $season:  MediaSeason,  $seasonYear: Int) 
-  {
-  Media(id: $id, type: $type, isAdult: $isAdult, sort: POPULARITY_DESC, season:$season, seasonYear: $seasonYear
-  ) {
-    id
-    type
-    title {
-      english
-      native
-    }
-    coverImage {
-      extraLarge
-      color
-    }
-    bannerImage
-    startDate {
-      year
-      month
-      day
-    }
-    endDate {
-      year
-      month
-      day
-    }
-    description
-    seasonYear
-    type
-    format
-    status(version: 2)
-    episodes
-    duration
-    chapters
-    volumes
-    genres
-    meanScore
-    averageScore
-    popularity
-    favourites
-    countryOfOrigin
-    trailer {
-      id
-      site
-    }
-    nextAiringEpisode {
-      airingAt
-      timeUntilAiring
-      episode
-    }
-    trailer {
-      id
-      site
-    }
-    rankings {
-      id
-      rank
-      type
-      format
-      year
-      season
-      allTime
-      context
-    }
-     relations {
-      edges {
-        id
-        relationType(version: 2)
-        node {
-          id
-          title {
-            userPreferred
-          }
-          format
-          type
-          status(version: 2)
-          bannerImage
-          coverImage {
-            large
-          }
-        }
-      }
-    }
+query media($id: Int, $type: MediaType, $isAdult: Boolean, $season:  MediaSeason,  $seasonYear: Int) {
+  Media(id: $id, type: $type, isAdult: $isAdult, sort: POPULARITY_DESC, season:$season, seasonYear: $seasonYear) {
+    ...allMedia
   }
 }
+${fragmentAllInfoOfMedia}
+${fragmentTitle}
 `
 
 async function Test({id, type}: any) {
